@@ -242,6 +242,7 @@ def get_course_runs_for_course(course_uuid):
         return []
 
 
+
 def get_course_run_details(course_run_key, fields):
     """
     Retrieve information about the course run with the given id
