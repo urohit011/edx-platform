@@ -125,9 +125,6 @@ from student.models import CourseEnrollment # TODO REMOVE THIS HARRYREIN
                 entitlement = enrollment if isinstance(enrollment, CourseEntitlement) else None
                 entitlement_session = entitlement.enrollment_course_run if entitlement else None
 
-                if dashboard_index % 2 == 0: # REMOVE THIS HARRYREIN
-                  entitlement_session = None  # REMOVE THIS HARRYREIN
-
                 is_fulfilled_entitlement = True if entitlement and entitlement_session else False
                 is_unfulfilled_entitlement = True if entitlement and not entitlement_session else False
 
@@ -135,10 +132,9 @@ from student.models import CourseEnrollment # TODO REMOVE THIS HARRYREIN
                 # the session to the first available entitlement course session in order to retrieve the metadata
                 # required to render the course card.
                 if entitlement:
+                  entitlement_available_sessions = course_entitlement_available_sessions[str(entitlement.uuid)]
+                  print entitlement_available_sessions
                   enrollment = entitlement_session if is_fulfilled_entitlement else None # TODO: Grab the first course if none exists for that particular course
-
-                  if dashboard_index % 2 == 0:# REMOVE THIS HARRYREIN
-                    enrollment = CourseEnrollment.objects.filter(user=user)[0] # REMOVE THIS HARRYREIN
 
                 # Grab display logic for the course card
                 session_id = enrollment.course_id

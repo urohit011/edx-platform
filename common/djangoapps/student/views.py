@@ -73,7 +73,7 @@ from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 # Note that this lives in LMS, so this dependency should be refactored.
 from notification_prefs.views import enable_notifications
 from openedx.core.djangoapps import monitoring_utils
-from openedx.core.djangoapps.catalog.utils import get_programs_with_type
+from openedx.core.djangoapps.catalog.utils import get_programs_with_type, get_course_runs_for_course
 from openedx.core.djangoapps.certificates.api import certificates_viewable_for_course
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credit.email_utils import get_credit_provider_display_names, make_providers_strings
@@ -684,13 +684,14 @@ def dashboard(request):
         'ACTIVATION_EMAIL_SUPPORT_LINK', settings.ACTIVATION_EMAIL_SUPPORT_LINK
     ) or settings.SUPPORT_SITE_LINK
 
+    # grab the entitlements for the user and filter them out of the enrollment list
+    course_entitlements = list(CourseEntitlement.objects.filter(user=user))
+    course_entitlement_available_sessions = {str(entitlement.uuid): get_course_runs_for_course(str(entitlement.uuid)) for entitlement in course_entitlements}
+    # TODO: filter the course runs from these entitlements out of the course_enrollments list to avoid duplicates
+
     # get the org whitelist or the org blacklist for the current site
     site_org_whitelist, site_org_blacklist = get_org_black_and_whitelist_for_site(user)
     course_enrollments = list(get_course_enrollments(user, site_org_whitelist, site_org_blacklist))
-
-    # grab the entitlements for the user and filter them out of the enrollment list
-    course_entitlements = list(CourseEntitlement.objects.filter(user=user)) + list(CourseEntitlement.objects.filter(user=user))
-    # TODO: filter the course runs from these entitlements out of the course_enrollments list to avoid duplicates
 
     # Record how many courses there are so that we can get a better
     # understanding of usage patterns on prod.
@@ -879,6 +880,7 @@ def dashboard(request):
         'account_activation_messages': account_activation_messages,
         'course_enrollments': course_enrollments,
         'course_entitlements': course_entitlements,
+        'course_entitlement_available_sessions': course_entitlement_available_sessions,
         'course_optouts': course_optouts,
         'banner_account_activation_message': banner_account_activation_message,
         'sidebar_account_activation_message': sidebar_account_activation_message,
