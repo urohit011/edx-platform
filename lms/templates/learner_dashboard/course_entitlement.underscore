@@ -3,9 +3,9 @@
     <div class="action-controls">
         <select class="session-select">
             <% for (var i=0; i< availableSessions.length; i++) { %>
-                <option data-course_id=<%-i%>><%-availableSessions[i] %></option>
+                <option data-course_id="100<%-i+1%>"><%-availableSessions[i] %></option>
             <% } %>
         </select>
-        <button class="enroll-btn"> Enroll In Session </button>
+        <button class="enroll-btn"> <%- gettext('Enroll In Session') %></button>
     </div>
 </div>

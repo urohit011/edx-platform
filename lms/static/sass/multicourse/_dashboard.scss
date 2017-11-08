@@ -163,11 +163,23 @@
                 display: inline-block;
               }
 
-              .info-date-block {
-                @extend %t-title7;
-
-                color: $gray; // WCAG 2.0 AA compliant
+              .info-date-block-container {
                 display: block;
+
+                .info-date-block{
+                  @extend %t-title7;
+
+                  color: $gray; // WCAG 2.0 AA compliant
+                }
+
+                .change-session {
+                  @extend %t-title7;
+                  @include margin(0, 0, 0, $baseline/4);
+
+                  padding: 0;
+                  border: none;
+                  letter-spacing: normal;
+                }
               }
             }
 

@@ -13,7 +13,6 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
 from openedx.core.djangolib.markup import HTML, Text
 
-
 from student.models import CourseEnrollment # TODO REMOVE THIS HARRYREIN
 %>
 
@@ -126,7 +125,8 @@ from student.models import CourseEnrollment # TODO REMOVE THIS HARRYREIN
                 entitlement = enrollment if isinstance(enrollment, CourseEntitlement) else None
                 entitlement_session = entitlement.enrollment_course_run if entitlement else None
 
-                entitlement_session = None  # REMOVE THIS HARRYREIN
+                if dashboard_index % 2 == 0: # REMOVE THIS HARRYREIN
+                  entitlement_session = None  # REMOVE THIS HARRYREIN
 
                 is_fulfilled_entitlement = True if entitlement and entitlement_session else False
                 is_unfulfilled_entitlement = True if entitlement and not entitlement_session else False
@@ -137,7 +137,8 @@ from student.models import CourseEnrollment # TODO REMOVE THIS HARRYREIN
                 if entitlement:
                   enrollment = entitlement_session if is_fulfilled_entitlement else None # TODO: Grab the first course if none exists for that particular course
 
-                  enrollment = CourseEnrollment.objects.filter(user=user)[0] # REMOVE THIS HARRYREIN
+                  if dashboard_index % 2 == 0:# REMOVE THIS HARRYREIN
+                    enrollment = CourseEnrollment.objects.filter(user=user)[0] # REMOVE THIS HARRYREIN
 
                 # Grab display logic for the course card
                 session_id = enrollment.course_id
@@ -155,7 +156,7 @@ from student.models import CourseEnrollment # TODO REMOVE THIS HARRYREIN
                 show_consent_link = (session_id in consent_required_courses)
                 course_overview = enrollment.course_overview
               %>
-              <%include file='dashboard/_dashboard_course_listing.html' args='course_overview=course_overview, enrollment=enrollment, is_unfulfilled_entitlement=is_unfulfilled_entitlement, is_fulfilled_entitlement=is_fulfilled_entitlement, entitlement=entitlement, show_courseware_link=show_courseware_link, cert_status=cert_status, can_unenroll=can_unenroll, credit_status=credit_status, show_email_settings=show_email_settings, course_mode_info=course_mode_info, is_paid_course=is_paid_course, is_course_blocked=is_course_blocked, verification_status=course_verification_status, course_requirements=course_requirements, dashboard_index=dashboard_index, share_settings=share_settings, user=user, related_programs=related_programs, display_course_modes_on_dashboard=display_course_modes_on_dashboard, show_consent_link=show_consent_link, enterprise_customer_name=enterprise_customer_name' />
+              <%include file='dashboard/_dashboard_course_listing.html' args='course_overview=course_overview, course_card_index=dashboard_index, enrollment=enrollment, is_unfulfilled_entitlement=is_unfulfilled_entitlement, is_fulfilled_entitlement=is_fulfilled_entitlement, entitlement=entitlement, entitlement_session=entitlement_session, show_courseware_link=show_courseware_link, cert_status=cert_status, can_unenroll=can_unenroll, credit_status=credit_status, show_email_settings=show_email_settings, course_mode_info=course_mode_info, is_paid_course=is_paid_course, is_course_blocked=is_course_blocked, verification_status=course_verification_status, course_requirements=course_requirements, dashboard_index=dashboard_index, share_settings=share_settings, user=user, related_programs=related_programs, display_course_modes_on_dashboard=display_course_modes_on_dashboard, show_consent_link=show_consent_link, enterprise_customer_name=enterprise_customer_name' />
             % endfor
 
             </ul>

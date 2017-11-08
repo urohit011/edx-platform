@@ -22,44 +22,69 @@
                  tpl: HtmlUtils.template(pageTpl),
 
                  events: {
-                     'change .session-select': 'updateEnrollBtn',
                      'click .enroll-btn': 'enrollInSession',
+                     'change .session-select': 'updateEnrollBtn'
                  },
 
                  initialize: function(options) {
                      this.$el = options.$el;
-                     this.entitlementModel = new EntitlementModel();
+                     this.entitlementModel = new EntitlementModel({
+                         availableSessions: options.availableSessions,
+                         entitlementUUID: options.entitlementUUID,
+                         currentSessionId: options.currentSessionId,
+                         userId: options.userId
+                     });
 
                      // Grab external dynamic elements and bind events
-                     this.$triggerOpenBtn = $(options.$triggerOpenBtn);
-                     this.$triggerOpenBtn.on('click', this.openPanel);
+                     this.$triggerOpenBtn = options.$triggerOpenBtn;
+                     this.$triggerOpenBtn.on('click', this.openPanel.bind(this));
 
                      this.render(options);
 
-                     this.$sessionSelect = this.$el.find('.session-select');
-                     this.$enrollBtn = this.$el.find('.enroll-btn');
+                     // Grab internal action elements
+                     this.$sessionSelect = this.$('.session-select');
+                     this.$enrollBtn = this.$('.enroll-btn');
+
                  },
 
                  render: function(options) {
-                     var data = $.extend(this.entitlementModel.toJSON(), {
-                         availableSessions: options.availableSessions,
-                         entitlementUUID: options.entitlementUUID
-                     });
+                     var data = this.entitlementModel.toJSON();
                      HtmlUtils.setHtml(this.$el, this.tpl(data));
+                     this.delegateEvents();
                  },
 
                  openPanel: function(e) {
+                     this.$enrollBtn.text(gettext('Change Session'));
                      this.$el.removeClass('hidden');
                  },
 
                  enrollInSession: function(e) {
-                     alert("we want to enroll the user in course with id: " + $this.$sessionSelect.val());
-                     console.log(this.$el.find('option:selected').data('course_id'));
+                     var session_id = this.$sessionSelect.find('option:selected').data('course_id');
+                     alert("we want to enroll the user in course with id: " + session_id);
+
+                     $.ajax({
+                        type: 'POST',
+                        url: 'hello',
+                        dataType: 'json',
+                        data: {
+                            course_id: session_id,
+                            user_id: this.entitlementModel.get('userId'),
+                        },
+                        success: _.bind(this.enrollSuccess, this),
+                        error: _.bind(this.enrollError, this)
+                    });
+                 },
+
+                 enrollSuccess: function() {
+                    alert("we successfully enrolled!");
+                 },
+
+                 enrollError: function() {
+                    alert("we failed to enroll..");
                  },
 
                  updateEnrollBtn: function() {
-                     var new_id = this.$el.find('option:selected').data('course_id');
-                     console.log("new_id");
+                     var new_id = this.$sessionSelect.find('option:selected').data('course_id');
                      this.$enrollBtn.removeClass('disabled');
                  },
              });

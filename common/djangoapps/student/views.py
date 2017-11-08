@@ -689,7 +689,7 @@ def dashboard(request):
     course_enrollments = list(get_course_enrollments(user, site_org_whitelist, site_org_blacklist))
 
     # grab the entitlements for the user and filter them out of the enrollment list
-    course_entitlements = list(CourseEntitlement.objects.filter(user=user))
+    course_entitlements = list(CourseEntitlement.objects.filter(user=user)) + list(CourseEntitlement.objects.filter(user=user))
     # TODO: filter the course runs from these entitlements out of the course_enrollments list to avoid duplicates
 
     # Record how many courses there are so that we can get a better
