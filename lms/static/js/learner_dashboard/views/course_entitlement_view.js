@@ -29,7 +29,7 @@
                  initialize: function(options) {
                      this.$el = options.$el;
                      this.entitlementModel = new EntitlementModel({
-                         availableSessions: options.availableSessions,
+                         availableSessions: this.formatDates(JSON.parse(options.availableSessions)),
                          entitlementUUID: options.entitlementUUID,
                          currentSessionId: options.currentSessionId,
                          userId: options.userId
@@ -37,7 +37,7 @@
 
                      // Grab external dynamic elements and bind events
                      this.$triggerOpenBtn = options.$triggerOpenBtn;
-                     this.$triggerOpenBtn.on('click', this.openPanel.bind(this));
+                     this.$triggerOpenBtn.on('click', this.togglePanel.bind(this));
 
                      this.render(options);
 
@@ -53,9 +53,23 @@
                      this.delegateEvents();
                  },
 
-                 openPanel: function(e) {
-                     this.$enrollBtn.text(gettext('Change Session'));
-                     this.$el.removeClass('hidden');
+                 togglePanel: function(e) {
+                     var enrollText = this.entitlementModel.attributes.currentSessionId ? gettext('Change Session') :
+                         gettext('Enroll in Session');
+                     this.$enrollBtn.text(enrollText);
+                     this.updateEnrollBtn();
+                     this.$el.toggleClass('hidden');
+                 },
+
+                 formatDates: function(sessionData) {
+                    var startDate, startDateString;
+                    for (var i = 0; i < sessionData.length; i++) {
+                        startDate = sessionData[i].session_start;
+                        startDateString = startDate ? (new Date(startDate)).toLocaleDateString() : '';
+                        sessionData[i].session_dates = sessionData[i].session_end ? startDateString + gettext(" to ")
+                            + (new Date(sessionData[i].session_end)).toLocaleDateString() : gettext("Starts ") + startDateString;
+                    }
+                    return sessionData;
                  },
 
                  enrollInSession: function(e) {
@@ -84,8 +98,14 @@
                  },
 
                  updateEnrollBtn: function() {
-                     var new_id = this.$sessionSelect.find('option:selected').data('course_id');
-                     this.$enrollBtn.removeClass('disabled');
+                     // Disable the enroll button if the user has selected an already enrolled session
+                     var new_session_id = this.$sessionSelect.find('option:selected').data('session_id');
+                     if (this.entitlementModel.attributes.currentSessionId == new_session_id) {
+                        this.$enrollBtn.addClass('disabled');
+                     } else {
+                        this.$enrollBtn.removeClass('disabled');
+                     }
+
                  },
              });
          }

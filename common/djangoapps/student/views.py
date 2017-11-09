@@ -75,7 +75,6 @@ from notification_prefs.views import enable_notifications
 from openedx.core.djangoapps import monitoring_utils
 from openedx.core.djangoapps.catalog.utils import get_programs_with_type, get_course_runs_for_course
 from openedx.core.djangoapps.certificates.api import certificates_viewable_for_course
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credit.email_utils import get_credit_provider_display_names, make_providers_strings
 from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.core.djangoapps.external_auth.login_and_register import login as external_auth_login
@@ -686,7 +685,7 @@ def dashboard(request):
 
     # grab the entitlements for the user and filter them out of the enrollment list
     course_entitlements = list(CourseEntitlement.objects.filter(user=user))
-    course_entitlement_available_sessions = {str(entitlement.uuid): get_course_runs_for_course(str(entitlement.uuid)) for entitlement in course_entitlements}
+    course_entitlement_available_sessions = {str(entitlement.uuid): get_course_runs_for_course(str(entitlement.course_uuid)) for entitlement in course_entitlements} # pylint: disable=line-too-long
     # TODO: filter the course runs from these entitlements out of the course_enrollments list to avoid duplicates
 
     # get the org whitelist or the org blacklist for the current site

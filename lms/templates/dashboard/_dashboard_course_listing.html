@@ -1,4 +1,4 @@
-<%page args="course_overview, enrollment, entitlement, entitlement_session, course_card_index, is_unfulfilled_entitlement, is_fulfilled_entitlement, show_courseware_link, cert_status, can_unenroll, credit_status, show_email_settings, course_mode_info, is_paid_course, is_course_blocked, verification_status, course_requirements, dashboard_index, share_settings, related_programs, display_course_modes_on_dashboard, show_consent_link, enterprise_customer_name" expression_filter="h"/>
+<%page args="course_overview, enrollment, entitlement, entitlement_session, course_card_index, is_unfulfilled_entitlement, is_fulfilled_entitlement, entitlement_available_sessions, show_courseware_link, cert_status, can_unenroll, credit_status, show_email_settings, course_mode_info, is_paid_course, is_course_blocked, verification_status, course_requirements, dashboard_index, share_settings, related_programs, display_course_modes_on_dashboard, show_consent_link, enterprise_customer_name" expression_filter="h"/>
 
 <%!
 import urllib
@@ -287,8 +287,8 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
               $el: $('#course-card-${course_card_index} .course-entitlement-selection-container'),
               $triggerOpenBtn: $('#course-card-${course_card_index} .change-session'),
               $dateDisplayField: '.info-date-block',
-              availableSessions: ['March to May','June to July', 'August to September'],
-              entitlementUUID: '${ entitlement.uuid | n, js_escaped_string }',
+              availableSessions: '${ entitlement_available_sessions | n, dump_js_escaped_json }',
+              entitlementUUID: '${ entitlement.course_uuid | n, js_escaped_string }',
               currentSessionId: '${ entitlement_session.course_id if entitlement_session else '' | n, js_escaped_string }',
               userId: '${ user.id | n, js_escaped_string }'
           });

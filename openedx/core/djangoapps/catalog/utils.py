@@ -211,21 +211,16 @@ def get_course_runs():
 
 
 def get_course_runs_for_course(course_uuid):
-    print 'TRYING HARRY!!!!'
     catalog_integration = CatalogIntegration.current()
-    print catalog_integration
-    print catalog_integration.is_enabled()
 
     if catalog_integration.is_enabled():
         try:
             user = catalog_integration.get_service_user()
-            print 'Failure'
         except ObjectDoesNotExist:
             logger.error(
                 'Catalog service user with username [%s] does not exist. Course runs will not be retrieved.',
                 catalog_integration.service_username,
             )
-            print 'Failure'
             return []
 
         api = create_catalog_api_client(user)
@@ -241,12 +236,9 @@ def get_course_runs_for_course(course_uuid):
             cache_key=cache_key if catalog_integration.is_cache_enabled else None,
             long_term_cache=True,
         )
-        print data
-
         return data.get('course_runs', [])
     else:
         return []
-
 
 
 def get_course_run_details(course_run_key, fields):
