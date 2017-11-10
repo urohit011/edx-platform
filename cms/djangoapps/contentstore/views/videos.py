@@ -484,8 +484,7 @@ def _get_and_validate_course(course_key_string, user):
     if (
             settings.FEATURES["ENABLE_VIDEO_UPLOAD_PIPELINE"] and
             getattr(settings, "VIDEO_UPLOAD_PIPELINE", None) and
-            course and
-            course.video_pipeline_configured
+            course
     ):
         return course
     else:
@@ -672,7 +671,7 @@ def videos_post(course, request):
         return JsonResponse({'error': error}, status=400)
 
     bucket = storage_service_bucket()
-    course_video_upload_token = course.video_upload_pipeline['course_video_upload_token']
+    course_video_upload_token = course.video_upload_pipeline.get('course_video_upload_token')
     req_files = data['files']
     resp_files = []
 

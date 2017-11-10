@@ -67,7 +67,7 @@
                   <li class="nav-item nav-course-courseware-textbooks">
                     <a href="${textbooks_url}">${_("Textbooks")}</a>
                   </li>
-                  % if context_course.video_pipeline_configured:
+                  % if settings.FEATURES.get('ENABLE_VIDEO_UPLOAD_PIPELINE'):
                   <li class="nav-item nav-course-courseware-videos">
                     <a href="${videos_url}">${_("Video Uploads")}</a>
                   </li>

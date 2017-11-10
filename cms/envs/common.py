@@ -199,7 +199,7 @@ FEATURES = {
     'ADVANCED_SECURITY': False,
 
     # Turn off Video Upload Pipeline through Studio, by default
-    'ENABLE_VIDEO_UPLOAD_PIPELINE': False,
+    'ENABLE_VIDEO_UPLOAD_PIPELINE': True,
 
     # let students save and manage their annotations
     # for consistency in user-experience, keep the value of this feature flag
