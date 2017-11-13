@@ -73,7 +73,7 @@
                  },
 
                  enrollInSession: function(e) {
-                     var session_id = this.$sessionSelect.find('option:selected').data('course_id');
+                     var session_id = this.$sessionSelect.find('option:selected').data('session_id');
                      alert("we want to enroll the user in course with id: " + session_id);
 
                      $.ajax({

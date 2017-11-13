@@ -683,7 +683,7 @@ def dashboard(request):
         'ACTIVATION_EMAIL_SUPPORT_LINK', settings.ACTIVATION_EMAIL_SUPPORT_LINK
     ) or settings.SUPPORT_SITE_LINK
 
-    # grab the entitlements for the user and filter them out of the enrollment list
+    # Get the entitlements for the user and filter them out of the enrollment list
     course_entitlements = list(CourseEntitlement.objects.filter(user=user))
     course_entitlement_available_sessions = {str(entitlement.uuid): get_course_runs_for_course(str(entitlement.course_uuid)) for entitlement in course_entitlements} # pylint: disable=line-too-long
     # TODO: filter the course runs from these entitlements out of the course_enrollments list to avoid duplicates
