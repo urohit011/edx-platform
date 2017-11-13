@@ -58,9 +58,6 @@
                      /*
                      Opens and closes the panel that allows a user to change their enrolled session.
                       */
-                     var enrollText = this.entitlementModel.attributes.currentSessionId ? gettext('Change Session') :
-                         gettext('Enroll in Session');
-                     this.$('.enroll-btn').text(enrollText);
                      this.updateEnrollBtn();
                      this.$el.toggleClass('hidden');
 
@@ -110,7 +107,7 @@
                  enrollSuccess: function(data) {
                     this.entitlementModel.set({currentSessionId: 'course-v1:edX+DemoX+Demo_Course'});
                     this.render(this.entitlementModel.toJSON());
-                    this.toggleSessionSelectionPanel()
+                    this.toggleSessionSelectionPanel();
 
                     // Update external elements on the course card to represent the now available course session
                     this.$triggerOpenBtn.removeClass('hidden');
@@ -127,6 +124,7 @@
                      /*
                      Disables the enroll button if the user has selected an already enrolled session.
                       */
+                     var enrollText;
                      var newSessionId = this.$sessionSelect.find('option:selected').data('session_id');
                      var enrollBtn = this.$('.enroll-btn');
                      if (this.entitlementModel.attributes.currentSessionId == newSessionId) {
@@ -135,6 +133,14 @@
                         enrollBtn.removeClass('disabled');
                      }
 
+                     // Update the button text
+                     if (newSessionId) {
+                         enrollText = this.entitlementModel.attributes.currentSessionId ? gettext('Change Session') :
+                             gettext('Enroll in Session');
+                     } else {
+                         enrollText = gettext("Leave Current Session");
+                     }
+                     this.$('.enroll-btn').text(enrollText);
                  },
              });
          }
