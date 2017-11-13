@@ -683,20 +683,23 @@ def dashboard(request):
         'ACTIVATION_EMAIL_SUPPORT_LINK', settings.ACTIVATION_EMAIL_SUPPORT_LINK
     ) or settings.SUPPORT_SITE_LINK
 
-    # Get the entitlements for the user and filter them out of the enrollment list
-    course_entitlements = list(CourseEntitlement.objects.filter(user=user))
-    course_entitlement_available_sessions = {str(entitlement.uuid): get_course_runs_for_course(str(entitlement.course_uuid)) for entitlement in course_entitlements} # pylint: disable=line-too-long
-    # TODO: filter the course runs from these entitlements out of the course_enrollments list to avoid duplicates
-
-    # get the org whitelist or the org blacklist for the current site
+    # Get the org whitelist or the org blacklist for the current site
     site_org_whitelist, site_org_blacklist = get_org_black_and_whitelist_for_site(user)
     course_enrollments = list(get_course_enrollments(user, site_org_whitelist, site_org_blacklist))
+
+    # Get the entitlements for the user
+    course_entitlements = list(CourseEntitlement.objects.filter(user=user))
+    course_entitlement_available_sessions = {str(entitlement.uuid): get_course_runs_for_course(str(entitlement.course_uuid)) for entitlement in course_entitlements} # pylint: disable=line-too-long
+
+    # Filter out any course enrollments that are associated with fulfilled entitlements
+    for entitlement in [e for e in course_entitlements if e.enrollment_course_run is not None]:
+        course_enrollments = [enr for enr in course_enrollments if entitlement.enrollment_course_run.course_id != enr.course_id] # pylint: disable=line-too-long
 
     # Record how many courses there are so that we can get a better
     # understanding of usage patterns on prod.
     monitoring_utils.accumulate('num_courses', len(course_enrollments))
 
-    # sort the enrollment pairs by the enrollment date
+    # Sort the enrollment pairs by the enrollment date
     course_enrollments.sort(key=lambda x: x.created, reverse=True)
 
     # Retrieve the course modes for each course
