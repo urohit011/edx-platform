@@ -1,4 +1,4 @@
-<div class="message is-shown">
+<div id="change-session-<%-entitlementUUID%>" class="message is-shown">
     <div class="action-header"> <%- gettext('Select a course session to enroll in:') %></div>
     <div class="action-controls">
         <select class="session-select">

@@ -113,7 +113,7 @@ from student.models import CourseEnrollment
         <div class="my-courses" id="my-courses">
           <%include file="learner_dashboard/_dashboard_navigation_courses.html"/>
 
-          % if len(course_enrollments) > 0 or len(course_entitlements) > 0:
+          % if len(course_entitlements + course_enrollments) > 0:
             <ul class="listing-courses">
             <%
                 share_settings = configuration_helpers.get_value(
@@ -147,6 +147,10 @@ from student.models import CourseEnrollment
                     enrollment = CourseEnrollment(user=user, course_id=next_session['key'], mode=next_session['type'])
 
                 session_id = enrollment.course_id
+                print show_courseware_links_for
+                print session_id
+                print "HHarry"
+                print is_fulfilled_entitlement
                 show_courseware_link = (session_id in show_courseware_links_for)
                 cert_status = cert_statuses.get(session_id)
                 can_unenroll = (not cert_status) or cert_status.get('can_unenroll') if not unfulfilled_entitlement else False

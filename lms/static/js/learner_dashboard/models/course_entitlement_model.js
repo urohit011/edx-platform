@@ -1,5 +1,5 @@
 /**
- *  Store data to enroll learners into the course
+ *  Store data for the current state of the course entitlement
  */
 (function(define) {
     'use strict';

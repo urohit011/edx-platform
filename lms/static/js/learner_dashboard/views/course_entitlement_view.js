@@ -35,16 +35,15 @@
                          userId: options.userId
                      });
 
-                     // Grab external dynamic elements and bind events
+                     // Grab action elements from outside the view and bind events
                      this.$triggerOpenBtn = options.$triggerOpenBtn;
-                     this.$triggerOpenBtn.on('click', this.togglePanel.bind(this));
+                     this.$triggerOpenBtn.on('click', this.toggleSessionSelectionPanel.bind(this));
 
                      this.render(options);
 
-                     // Grab internal action elements
+                     // Grab action elements from the newly generated view
                      this.$sessionSelect = this.$('.session-select');
                      this.$enrollBtn = this.$('.enroll-btn');
-
                  },
 
                  render: function(options) {
@@ -53,15 +52,27 @@
                      this.delegateEvents();
                  },
 
-                 togglePanel: function(e) {
+                 toggleSessionSelectionPanel: function(e) {
+                     /*
+                     Opens and closes the panel that allows a user to change their enrolled session.
+                      */
                      var enrollText = this.entitlementModel.attributes.currentSessionId ? gettext('Change Session') :
                          gettext('Enroll in Session');
                      this.$enrollBtn.text(enrollText);
                      this.updateEnrollBtn();
                      this.$el.toggleClass('hidden');
+
+                     // Set focus to the session selection for a11y purposes
+                     if (!this.$el.hasClass('hidden')){
+                         this.$sessionSelect.focus();
+                     }
                  },
 
                  formatDates: function(sessionData) {
+                     /*
+                     Updates a passed in data object with a localized string representing the start and end
+                     dates for a particular course session.
+                      */
                     var startDate, startDateString;
                     for (var i = 0; i < sessionData.length; i++) {
                         startDate = sessionData[i].session_start;
@@ -98,7 +109,9 @@
                  },
 
                  updateEnrollBtn: function() {
-                     // Disable the enroll button if the user has selected an already enrolled session
+                     /*
+                     Disables the enroll button if the user has selected an already enrolled session.
+                      */
                      var new_session_id = this.$sessionSelect.find('option:selected').data('session_id');
                      if (this.entitlementModel.attributes.currentSessionId == new_session_id) {
                         this.$enrollBtn.addClass('disabled');

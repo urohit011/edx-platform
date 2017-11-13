@@ -687,13 +687,9 @@ def dashboard(request):
     site_org_whitelist, site_org_blacklist = get_org_black_and_whitelist_for_site(user)
     course_enrollments = list(get_course_enrollments(user, site_org_whitelist, site_org_blacklist))
 
-    # Get the entitlements for the user
+    # Get the entitlements for the user and a list of available course sessions for that entitlement
     course_entitlements = list(CourseEntitlement.objects.filter(user=user))
     course_entitlement_available_sessions = {str(entitlement.uuid): get_course_runs_for_course(str(entitlement.course_uuid)) for entitlement in course_entitlements} # pylint: disable=line-too-long
-
-    # Filter out any course enrollments that are associated with fulfilled entitlements
-    for entitlement in [e for e in course_entitlements if e.enrollment_course_run is not None]:
-        course_enrollments = [enr for enr in course_enrollments if entitlement.enrollment_course_run.course_id != enr.course_id] # pylint: disable=line-too-long
 
     # Record how many courses there are so that we can get a better
     # understanding of usage patterns on prod.
@@ -872,6 +868,10 @@ def dashboard(request):
 
     valid_verification_statuses = ['approved', 'must_reverify', 'pending', 'expired']
     display_sidebar_on_dashboard = len(order_history_list) or verification_status in valid_verification_statuses
+
+    # Filter out any course enrollments that are associated with fulfilled entitlements
+    for entitlement in [e for e in course_entitlements if e.enrollment_course_run is not None]:
+        course_enrollments = [enr for enr in course_enrollments if entitlement.enrollment_course_run.course_id != enr.course_id] # pylint: disable=line-too-long
 
     context = {
         'enterprise_message': enterprise_message,
