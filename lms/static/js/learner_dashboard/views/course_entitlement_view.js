@@ -90,6 +90,10 @@
                  enrollInSession: function(e) {
                      var session_id = this.$sessionSelect.find('option:selected').data('session_id');
 
+                     if (this.$('.enroll-btn').hasClass('disabled')) {
+                         return;
+                     }
+
                      $.ajax({
                         type: 'POST',
                         url: this.enrollUrl,
@@ -115,8 +119,8 @@
                     this.$enterCourseBtn.attr('href','#'); // TODO: get this to be a real string HarryRein!!!
                  },
 
-                 enrollError: function() {
-                    alert("we failed to enroll..");
+                 enrollError: function(data) {
+                    alert("There was an error in ");
                  },
 
                  updateEnrollBtn: function() {
