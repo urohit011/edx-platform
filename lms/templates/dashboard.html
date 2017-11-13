@@ -143,14 +143,13 @@ from student.models import CourseEnrollment
                     enrollment = entitlement_session
                   else:
                     # If the user has an unfulfilled entitlement, pass through a bare CourseEnrollment object built off of the next available session
-                    next_session = course_entitlement_available_sessions[str(entitlement.uuid)][0]
+                    upcoming_sessions = course_entitlement_available_sessions[str(entitlement.uuid)]
+                    next_session = upcoming_sessions[0] if upcoming_sessions else None
+                    if not next_session:
+                        continue
                     enrollment = CourseEnrollment(user=user, course_id=next_session['key'], mode=next_session['type'])
 
                 session_id = enrollment.course_id
-                print show_courseware_links_for
-                print session_id
-                print "HHarry"
-                print is_fulfilled_entitlement
                 show_courseware_link = (session_id in show_courseware_links_for)
                 cert_status = cert_statuses.get(session_id)
                 can_unenroll = (not cert_status) or cert_status.get('can_unenroll') if not unfulfilled_entitlement else False
