@@ -24,3 +24,18 @@ class CourseEntitlement(TimeStampedModel):
         help_text='The current Course enrollment for this entitlement. If NULL the Learner has not enrolled.'
     )
     order_number = models.CharField(max_length=128, null=True)
+
+    @classmethod
+    def get_open_user_course_entitlements(cls, user, course_uuid):
+
+        return cls.objects.get(
+            user=user,
+            course_uuid=course_uuid,
+            expired_at=None,
+            enrollment_course_run=None
+        )
+
+    @classmethod
+    def set_enrollment(cls, entitlement, enrollment):
+
+        cls.objects.filter(id=entitlement.id).update(enrollment_course_run=enrollment)

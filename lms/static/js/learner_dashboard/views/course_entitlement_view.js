@@ -34,6 +34,7 @@
                          currentSessionId: options.currentSessionId,
                          userId: options.userId
                      });
+                     this.enrollUrl = options.enrollUrl;
 
                      // Grab action elements from outside the view and bind events
                      this.$triggerOpenBtn = options.$triggerOpenBtn;
@@ -91,14 +92,14 @@
 
                      $.ajax({
                         type: 'POST',
-                        url: 'hello',
+                        url: this.enrollUrl,
                         dataType: 'json',
                         data: {
                             course_id: session_id,
-                            user_id: this.entitlementModel.get('userId'),
+                            course_uuid: this.entitlementModel.get('entitlementUUID'),
                         },
-                        success: _.bind(this.enrollError, this), // TODO: Switch this back!!! HarryRein
-                        error: _.bind(this.enrollSuccess, this)
+                        success: _.bind(this.enrollSuccess, this),
+                        error: _.bind(this.enrollError, this)
                     });
                  },
 
