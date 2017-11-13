@@ -1,5 +1,13 @@
+{% load i18n %}
+
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<title>{% block title %}Reply to {{ thread_title }} at {{ comment_created_at }} {% endblock %}</title>
+<title>
+    {% block title %}
+        {% blocktrans trimmed %}
+            Reply to {{ thread_title }} at {{ comment_created_at }}
+        {% endblocktrans %}
+    {% endblock %}
+</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
 <style type="text/css">

@@ -1,36 +1,25 @@
 {% load i18n %}
 {% load static %}
 
-<%!
-from django.utils.translation import ugettext as _
-%>
-
-{% block preview_text %}
-    ${_("Hi {username}").format(username=thread_username)}
-{% endblock %}
-
 {% block content %}
 <table width="100%" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
     <tr>
         <td>
             <h1>
-                ${_("Hi {username},").format(username=thread_username)}
+                {% blocktrans trimmed %}
+                    {{ comment_username }} replied to your {{ thread_title }} post
+                {% endblocktrans %}
             </h1>
 
             <p>
-                ${_("{username} made the following reply to {thread_title} at {date}").format(
-                    username=comment_username,
-                    thread_title=thread_title,
-                    date=comment_created_at
-                )}
+                {{ comment_body }}
             </p>
 
             <p>
-                ${_("{comment_body}").format(comment_body=comment_body)}
+                <a href="{{ post_link }}"> {% trans "Reply to post" %} </a>
             </p>
-
             <p>
-                <a href="{{ post_link }}"> ${_("View the discussion.")} </a>
+                <a href="{{ post_link }}"> {% trans "View discussion" %} </a>
             </p>
 
             <p>

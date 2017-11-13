@@ -104,6 +104,7 @@ def _build_message_context(context):
     message_context = get_base_template_context(Site.objects.get(id=context['site_id']))
     message_context.update(_deserialize_context_dates(context))
     message_context['post_link'] = _get_thread_url(context)
+    # message_context['unfollow_link'] =
     message_context['ga_tracking_pixel_url'] = _generate_ga_pixel_url(context)
     return message_context
 

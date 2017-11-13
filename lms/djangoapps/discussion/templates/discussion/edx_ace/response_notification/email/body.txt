@@ -1,5 +1,16 @@
 {% load i18n %}
 
+{% block content %}
 {% blocktrans trimmed %}
-    This is the reply to your thread:
+    {{ comment_username }} replied to your {{ thread_title }} post
 {% endblocktrans %}
+
+{{ comment_body }}
+
+<a href="{{ post_link }}"> {% trans "Reply to post" %} </a>
+<a href="{{ post_link }}"> {% trans "View discussion" %} </a>
+{% endblock %}
+
+{% block google_analytics_pixel %}
+<img src="{{ ga_tracking_pixel_url }}" alt="" role="presentation" aria-hidden="true" />
+{% endblock %}
