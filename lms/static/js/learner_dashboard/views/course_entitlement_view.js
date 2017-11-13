@@ -36,42 +36,37 @@
                      });
                      this.enrollUrl = options.enrollUrl;
 
-                     // Grab action elements from outside the view and bind events
-                     this.$triggerOpenBtn = options.$triggerOpenBtn;
-                     this.$dateDisplayField = options.$dateDisplayField;
-                     this.$enterCourseBtn = options.$enterCourseBtn;
+                     // Grab elements from the parent card that work with this view and bind associated events
+                     this.$triggerOpenBtn = options.$triggerOpenBtn; // Opens and closes session selection view
+                     this.$dateDisplayField = options.$dateDisplayField; // Displays current session dates
+                     this.$enterCourseBtn = options.$enterCourseBtn; // Link to course home page
                      this.$triggerOpenBtn.on('click', this.toggleSessionSelectionPanel.bind(this));
 
                      this.render(options);
-
-                     // Grab action elements from the newly generated view
-                     this.$sessionSelect = this.$('.session-select');
                  },
 
                  render: function(options) {
-                     var data = this.entitlementModel.toJSON();
-                     HtmlUtils.setHtml(this.$el, this.tpl(data));
+                     HtmlUtils.setHtml(this.$el, this.tpl(this.entitlementModel.toJSON()));
                      this.delegateEvents();
                  },
 
                  toggleSessionSelectionPanel: function(e) {
-                     /*
-                     Opens and closes the panel that allows a user to change their enrolled session.
-                      */
-                     this.updateEnrollBtn();
-                     this.$el.toggleClass('hidden');
-
-                     // Set focus to the session selection for a11y purposes
-                     if (!this.$el.hasClass('hidden')){
-                         this.$sessionSelect.focus();
-                     }
+                    /*
+                    Opens and closes the session selection panel.
+                    */
+                    this.$el.toggleClass('hidden');
+                    if (!this.$el.hasClass('hidden')){
+                        // Set focus to the session selection for a11y purposes
+                        this.$('.session-select').focus();
+                    }
+                    this.updateEnrollBtn();
                  },
 
                  formatDates: function(sessionData) {
-                     /*
-                     Updates a passed in data object with a localized string representing the start and end
-                     dates for a particular course session.
-                      */
+                    /*
+                    Updates a passed in data object with a localized string representing the start and end
+                    dates for a particular course session.
+                    */
                     var startDate, startDateString, isCurrentlyEnrolled;
                     for (var i = 0; i < sessionData.length; i++) {
                         isCurrentlyEnrolled = (sessionData[i].session_id)
@@ -85,47 +80,68 @@
                  },
 
                  enrollInSession: function(e) {
-                     var session_id = this.$sessionSelect.find('option:selected').data('session_id');
+                    this.currentSessionSelection = this.$('.session-select').find('option:selected').data('session_id');
 
-                     if (this.$('.enroll-btn').hasClass('disabled')) {
-                         return;
-                     }
+                    if (this.$('.enroll-btn').hasClass('disabled')) {
+                        return;
+                    }
 
-                     $.ajax({
+                    if (!this.currentSessionSelection) {
+                        alert("We want to unenroll the user!");
+                        return;
+                    }
+
+                    // Ensure the user cannot double submit the enrollment
+                    this.$('.enroll-btn').addClass('disabled');
+                    this.$dateDisplayField.html('<span class="fa fa-spinner fa-spin"></span>');
+
+                    $.ajax({
                         type: 'POST',
                         url: this.enrollUrl,
                         dataType: 'json',
                         data: {
-                            course_id: session_id,
+                            course_id: this.currentSessionSelection,
                             course_uuid: this.entitlementModel.get('entitlementUUID'),
                         },
                         success: _.bind(this.enrollSuccess, this),
-                        error: _.bind(this.enrollError, this)
+                        error: _.bind(this.enrollError, this),
+                        complete: _.bind(this.enrollComplete, this),
                     });
                  },
 
                  enrollSuccess: function(data) {
-                    this.entitlementModel.set({currentSessionId: 'course-v1:edX+DemoX+Demo_Course'});
-                    this.render(this.entitlementModel.toJSON());
-                    this.toggleSessionSelectionPanel();
+                    // Update the model with the new session Id
+                    this.entitlementModel.set({currentSessionId: this.currentSessionSelection});
 
                     // Update external elements on the course card to represent the now available course session
                     this.$triggerOpenBtn.removeClass('hidden');
-                    this.$dateDisplayField.text(this.$sessionSelect.val());
+                    this.$dateDisplayField.html(this.$('.session-select').val());
+                    // TODO: get this to be a real string pointing to the course
+                    this.$enterCourseBtn.attr('href','#');
                     this.$enterCourseBtn.removeClass('hidden');
-                    this.$enterCourseBtn.attr('href','#'); // TODO: get this to be a real string HarryRein!!!
+                    this.$dateDisplayField.prepend('<span class="fa fa-check"></span>');
+
+                    // Reload the session selection panel
+                    this.render(this.entitlementModel.toJSON());
+                    this.toggleSessionSelectionPanel();
                  },
 
                  enrollError: function(data) {
                     alert("There was an error in ");
+                    this.$dateDisplayField.find('fa fa-spin').removeClass('fa-spin fa-spinner').addClass('fa-');
+                 },
+
+                 enrollComplete: function(data) {
+                    this.$('.enroll-btn').removeClass('disabled');
                  },
 
                  updateEnrollBtn: function() {
                      /*
-                     Disables the enroll button if the user has selected an already enrolled session.
+                     Disables the enroll button if the user has selected an already enrolled session
+                     and updates the text to represent the desired action.
                       */
                      var enrollText;
-                     var newSessionId = this.$sessionSelect.find('option:selected').data('session_id');
+                     var newSessionId = this.$('.session-select').find('option:selected').data('session_id');
                      var enrollBtn = this.$('.enroll-btn');
                      if (this.entitlementModel.attributes.currentSessionId == newSessionId) {
                         enrollBtn.addClass('disabled');
