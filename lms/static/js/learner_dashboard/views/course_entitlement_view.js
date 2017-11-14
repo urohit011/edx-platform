@@ -48,6 +48,7 @@
                  render: function(options) {
                      HtmlUtils.setHtml(this.$el, this.tpl(this.entitlementModel.toJSON()));
                      this.delegateEvents();
+                     this.updateEnrollBtn();
                  },
 
                  toggleSessionSelectionPanel: function(e) {
@@ -160,19 +161,20 @@
                      }
                      this.$('.enroll-btn-initial').text(enrollText);
 
-                     // Update the button popover to enable two step authentication and bind enroll to event.
+                     // Update the button popover to enable two step authentication.
                      if (newSessionId) {
                          confirmationText = currentSessionId ?
                              gettext('Are you sure that you would like to change session?') :
                              gettext('Are you sure that you would like to enroll in this session?');
                      } else {
-                         confirmationText = gettext("Are you sure that you would like to unenroll from this session?");
+                         confirmationText = gettext('Are you sure that you would like to unenroll from this session?');
                      }
+                     $('.enroll-btn-initial').popover('dispose');
                      $('.enroll-btn-initial').popover({
                         placement: 'bottom',
                         container: this.$el,
                         html: true,
-                        trigger: 'click',
+                        trigger: 'focus',
                         content: '<p>' + confirmationText + '</p>' + '<div class="action-items">' +
                             '<button type="button" class="popover-dismiss final-confirmation-btn" tabindex="0">'+ gettext('No') + '</button>' +
                             '<button type="button" class="enroll-btn final-confirmation-btn" tabindex="0">'+ gettext('Yes') + '</button>'

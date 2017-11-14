@@ -1018,10 +1018,9 @@
         position: relative;
 
         .btn {
-          @include float(right);
+          @extend %btn-pl-green-base;
 
-          background-color: theme-color('purchase');
-          color: theme-color('inverse');
+          @include float(right);
         }
       }
     }
