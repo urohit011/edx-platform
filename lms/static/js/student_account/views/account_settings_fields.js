@@ -61,8 +61,16 @@
                         url: '/i18n/setlang/',
                         data: data,
                         dataType: 'html',
-                        success: function() {
+                        success: function(data, textStatus, xhr) {
                             view.showSuccessMessage();
+                            // TODO: Remove Django 1.11 upgrade shim
+                            // SHIM: This condition will always be true after upgrading to 1.11, which should return
+                            // http 204, so the code block can be moved outside of the conditional.  Django 1.8 will
+                            // return a 302 which causes the browser to transparently handle the redirect, making the
+                            // settings page to appear to change language.  We probably want to preserve this behavior.
+                            if (xhr.status != 302) {
+                                location.reload(true);
+                            }
                         },
                         error: function() {
                             view.showNotificationMessage(
