@@ -1101,7 +1101,7 @@
         background-color: theme-color("inverse");
         height: $baseline*1.5;
         flex-grow: 5;
-        margin-bottom: $baseline/4;
+        margin-bottom: $baseline*0.4;
       }
 
       .enroll-btn-initial {
@@ -1127,11 +1127,11 @@
         }
       }
 
-      @include media-breakpoint-down(sm) {
+      @include media-breakpoint-down(xs) {
         flex-direction: column;
 
         .enroll-btn-initial {
-          @include margin-left(0);
+          margin: $baseline/2 0 $baseline/4;
         }
       }
     }
@@ -1140,7 +1140,7 @@
       .action-items {
         display: flex;
         justify-content: space-between;
-        margin-top: $baseline/4;
+        margin-top: $baseline/2;
 
         .final-confirmation-btn {
           box-shadow: none;

@@ -23,7 +23,9 @@
 
                  events: {
                      'change .session-select': 'updateEnrollBtn',
-                     'click .enroll-btn': 'handleEnrollChange'
+                     'click .enroll-btn': 'handleEnrollChange',
+                     'click .popover-dismiss': 'hideVerificationDialog',
+                     'keydown .final-confirmation-btn': 'handleVerificationPopoverA11y'
                  },
 
                  initialize: function(options) {
@@ -59,6 +61,7 @@
                     if (!this.$el.hasClass('hidden')){
                         // Set focus to the session selection for a11y purposes
                         this.$('.session-select').focus();
+                        this.$('.enroll-btn-initial').popover('hide');
                     }
                     this.updateEnrollBtn();
                  },
@@ -134,24 +137,25 @@
                  },
 
                  updateEnrollBtn: function() {
-                     /*
-                      This function plays three crucial roles:
-                      1) Enables and Disables enroll button
-                      2) Changes text to describe the action taken
-                      3) Formats the confirmation popover to allow for two step authentication
-                      */
+                    /*
+                    This function plays three crucial roles:
+                    1) Enables and disables enroll button
+                    2) Changes text to describe the action taken
+                    3) Formats the confirmation popover to allow for two step authentication
+                    */
                      var enrollText,
                         confirmationText;
                      var currentSessionId = this.entitlementModel.get('currentSessionId');
                      var newSessionId = this.$('.session-select').find('option:selected').data('session_id');
-                     var enrollBtn = this.$('.enroll-btn-initial');
+                     var enrollBtnInitial = this.$('.enroll-btn-initial');
 
                      // Disable the button if the user is already enrolled in that session.
                      if (currentSessionId == newSessionId) {
-                        enrollBtn.addClass('disabled');
-                     } else {
-                        enrollBtn.removeClass('disabled');
+                        enrollBtnInitial.addClass('disabled');
+                        enrollBtnInitial.popover('dispose');
+                        return;
                      }
+                     enrollBtnInitial.removeClass('disabled');
 
                      // Update the button text based on whether the user is initially enrolling or changing session.
                      if (newSessionId) {
@@ -169,17 +173,48 @@
                      } else {
                          confirmationText = gettext('Are you sure that you would like to unenroll from this session?');
                      }
-                     this.$('.enroll-btn-initial').popover('dispose');
-                     this.$('.enroll-btn-initial').popover({
+                     enrollBtnInitial.popover('dispose');
+                     enrollBtnInitial.popover({
                         placement: 'bottom',
                         container: this.$el,
                         html: true,
-                        trigger: 'focus',
-                        content: '<p>' + confirmationText + '</p>' + '<div class="action-items">' +
-                            '<button type="button" class="popover-dismiss final-confirmation-btn" tabindex="0">'+ gettext('No') + '</button>' +
-                            '<button type="button" class="enroll-btn final-confirmation-btn" tabindex="0">'+ gettext('Yes') + '</button>'
-                            + '</div>'
+                        trigger: 'click',
+                        content: '<div class="verification-modal" role="dialog"' +
+                            'aria-labelledby="enrollment-verification-title">' +
+                            '<p id="enrollment-verification-title">' + confirmationText + '</p>' +
+                            '<div class="action-items">' +
+                            '<button type="button" class="popover-dismiss final-confirmation-btn" tabindex="0">' +
+                            gettext('No') + '</button>' +
+                            '<button type="button" class="enroll-btn final-confirmation-btn" tabindex="0">' +
+                            gettext('Yes') + '</button>' +
+                            '</div>' + '</div>'
                     });
+
+                    // Ensure that focus moves to the popover on click of the initial change enrollment button.
+                    this.$('.enroll-btn-initial').on('click', function() {
+                        $(this).closest('.course-entitlement-selection-container')
+                            .find('.final-confirmation-btn:first').focus();
+                    });
+                 },
+
+                 handleVerificationPopoverA11y: function(e) {
+                    /* Ensure that the second step verification popover is treated as an a11y compliant dialog */
+                    var nextButton;
+                    var openButton = $(e.target).closest('.course-entitlement-selection-container')
+                        .find('.enroll-btn-initial');
+                    if (e.key == 'Tab') {
+                        e.preventDefault();
+                        nextButton = $(e.target).is(':first-child') ? $(e.target).next('.final-confirmation-btn') :
+                            $(e.target).prev('.final-confirmation-btn');
+                        nextButton.focus();
+                    } else if (e.key == 'Escape') {
+                        openButton.popover('hide');
+                        openButton.focus();
+                    }
+                 },
+
+                 hideVerificationDialog: function() {
+                   this.$('.enroll-btn-initial').focus().popover('hide');
                  },
              });
          }
