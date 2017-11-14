@@ -97,11 +97,14 @@
                     $.ajax({
                         type: 'POST',
                         url: this.enrollUrl,
+                        contentType: 'application/json',
                         dataType: 'json',
-                        data: {
-                            course_id: this.currentSessionSelection,
-                            course_uuid: this.entitlementModel.get('entitlementUUID'),
-                        },
+                        data: JSON.stringify({
+                            course_details: {
+                              course_id: this.currentSessionSelection,
+                              course_uuid: this.entitlementModel.get('entitlementUUID'),
+                            }
+                          }),
                         success: _.bind(this.enrollSuccess, this),
                         error: _.bind(this.enrollError, this),
                     });
