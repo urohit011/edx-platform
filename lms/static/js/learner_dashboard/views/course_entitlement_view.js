@@ -23,7 +23,7 @@
 
                  events: {
                      'change .session-select': 'updateEnrollBtn',
-                     'change .enroll-btn': 'enrollInSession'
+                     'click .enroll-btn': 'handleEnrollChange'
                  },
 
                  initialize: function(options) {
@@ -79,7 +79,7 @@
                     return sessionData;
                  },
 
-                 enrollInSession: function(e) {
+                 handleEnrollChange: function(e) {
                     this.currentSessionSelection = this.$('.session-select').find('option:selected').data('session_id');
 
                     if (this.$('.enroll-btn-initial').hasClass('disabled')) {
@@ -128,7 +128,7 @@
                  },
 
                  enrollError: function(data) {
-                    alert("There was an error in ");
+                    alert("There was an error.");
                     this.$dateDisplayField.find('fa fa-spin').removeClass('fa-spin fa-spinner').addClass('fa-');
                  },
 
@@ -158,8 +158,7 @@
                      } else {
                          enrollText = gettext("Leave Current Session");
                      }
-                     this.$('.enroll-btn').text(enrollText);
-
+                     this.$('.enroll-btn-initial').text(enrollText);
 
                      // Update the button popover to enable two step authentication and bind enroll to event.
                      if (newSessionId) {
@@ -171,14 +170,14 @@
                      }
                      $('.enroll-btn-initial').popover({
                         placement: 'bottom',
-                        container: 'body',
+                        container: this.$el,
                         html: true,
-                        trigger: 'focus',
-                        content: '<p>' + confirmationText + '</p>' +
-                            '<button type="button" class="popover-dismiss final-confirmation" tabindex="0">'+ gettext('No') + '</button>' +
-                            '<button type="button" class="enroll-btn final-confirmation" tabindex="0">'+ gettext('Yes') + '</button>'
+                        trigger: 'click',
+                        content: '<p>' + confirmationText + '</p>' + '<div class="action-items">' +
+                            '<button type="button" class="popover-dismiss final-confirmation-btn" tabindex="0">'+ gettext('No') + '</button>' +
+                            '<button type="button" class="enroll-btn final-confirmation-btn" tabindex="0">'+ gettext('Yes') + '</button>'
+                            + '</div>'
                     });
-                     // $('.enroll-btn-initial').on('click', function(){alert('hi'), this.$('.popover-dismiss').focus()}, this);
                  },
              });
          }

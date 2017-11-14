@@ -37,6 +37,8 @@ from student.models import CourseEnrollment
 
 <%block name="js_extra">
   <script src="${static.url('js/commerce/credit.js')}"></script>
+  <script type="text/javascript" src="${static.url('common/js/vendor/popper.js')}"></script>
+  <script type="text/javascript" src="${static.url('common/js/vendor/bootstrap.js')}"></script>
   <%static:js group='dashboard'/>
   <script type="text/javascript">
     $(document).ready(function() {
