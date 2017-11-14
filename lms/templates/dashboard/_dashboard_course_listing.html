@@ -129,7 +129,7 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
 
             <span class="info-date-block-container">
                 % if is_unfulfilled_entitlement:
-                    <span class="info-date-block">
+                    <span class="info-date-block" aria-live="polite">
                         <span class="icon fa fa-warning" aria-hidden="true"></span>
                         ${_('You must select a session below to access course.')}
                     </span>

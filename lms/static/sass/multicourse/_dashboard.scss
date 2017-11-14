@@ -170,6 +170,10 @@
                   @extend %t-title7;
 
                   color: $gray; // WCAG 2.0 AA compliant
+
+                  .fa-close {
+                    color: theme-color("error");
+                  }
                 }
 
                 .change-session {

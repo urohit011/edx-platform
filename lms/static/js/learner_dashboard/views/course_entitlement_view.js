@@ -132,8 +132,9 @@
                  },
 
                  enrollError: function(data) {
-                    alert("There was an error.");
-                    this.$dateDisplayField.find('fa fa-spin').removeClass('fa-spin fa-spinner').addClass('fa-');
+                    this.$dateDisplayField.find('.fa.fa-spin').removeClass('fa-spin fa-spinner').addClass('fa-close');
+                    this.$dateDisplayField.append(gettext('There was an error, please reload the page and try again.'));
+                    this.hideVerificationDialog();
                  },
 
                  updateEnrollBtn: function() {
@@ -144,7 +145,7 @@
                     3) Formats the confirmation popover to allow for two step authentication
                     */
                      var enrollText,
-                        confirmationText;
+                        confirmationHTML;
                      var currentSessionId = this.entitlementModel.get('currentSessionId');
                      var newSessionId = this.$('.session-select').find('option:selected').data('session_id');
                      var enrollBtnInitial = this.$('.enroll-btn-initial');
@@ -167,11 +168,15 @@
 
                      // Update the button popover to enable two step authentication.
                      if (newSessionId) {
-                         confirmationText = currentSessionId ?
-                             gettext('Are you sure that you would like to change session?') :
+                         confirmationHTML = currentSessionId ?
+                             gettext('Are you sure that you would like to change session?') + '<br><br>' +
+                             gettext(' Please know that by choosing to switch sessino you will lose any progress you' +
+                             'had made in this session.') :
                              gettext('Are you sure that you would like to enroll in this session?');
                      } else {
-                         confirmationText = gettext('Are you sure that you would like to unenroll from this session?');
+                         confirmationHTML = gettext('Are you sure that you would like to unenroll from this session?') +
+                         '<br><br>' + gettext('Please know that by unenrolling you will lose any progress you had' +
+                         ' made in this session.');
                      }
                      enrollBtnInitial.popover('dispose');
                      enrollBtnInitial.popover({
@@ -181,7 +186,7 @@
                         trigger: 'click',
                         content: '<div class="verification-modal" role="dialog"' +
                             'aria-labelledby="enrollment-verification-title">' +
-                            '<p id="enrollment-verification-title">' + confirmationText + '</p>' +
+                            '<p id="enrollment-verification-title">' + confirmationHTML + '</p>' +
                             '<div class="action-items">' +
                             '<button type="button" class="popover-dismiss final-confirmation-btn" tabindex="0">' +
                             gettext('No') + '</button>' +
