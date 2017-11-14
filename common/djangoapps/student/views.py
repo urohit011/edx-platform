@@ -917,6 +917,7 @@ def dashboard(request):
         'disable_courseware_js': True,
         'display_course_modes_on_dashboard': enable_verified_certificates and display_course_modes_on_dashboard,
         'display_sidebar_on_dashboard': display_sidebar_on_dashboard,
+        'uses_bootstrap': True,
     }
 
     ecommerce_service = EcommerceService()

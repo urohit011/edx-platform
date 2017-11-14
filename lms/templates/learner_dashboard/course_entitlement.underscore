@@ -14,6 +14,6 @@
                 <option><%- gettext('Leave current session and decide later.')%></option>
             <% } %>
         </select>
-        <button class="enroll-btn"> <%- gettext('Enroll In Session') %></button>
+        <button class="enroll-btn-initial"> <%- gettext('Enroll In Session') %></button>
     </div>
 </div>

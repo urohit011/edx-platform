@@ -22,8 +22,8 @@
                  tpl: HtmlUtils.template(pageTpl),
 
                  events: {
-                     'click .enroll-btn': 'enrollInSession',
-                     'change .session-select': 'updateEnrollBtn'
+                     'change .session-select': 'updateEnrollBtn',
+                     'change .enroll-btn': 'enrollInSession'
                  },
 
                  initialize: function(options) {
@@ -82,7 +82,7 @@
                  enrollInSession: function(e) {
                     this.currentSessionSelection = this.$('.session-select').find('option:selected').data('session_id');
 
-                    if (this.$('.enroll-btn').hasClass('disabled')) {
+                    if (this.$('.enroll-btn-initial').hasClass('disabled')) {
                         return;
                     }
 
@@ -91,8 +91,7 @@
                         return;
                     }
 
-                    // Ensure the user cannot double submit the enrollment
-                    this.$('.enroll-btn').addClass('disabled');
+                    // Display the indicator icon
                     this.$dateDisplayField.html('<span class="fa fa-spinner fa-spin"></span>');
 
                     $.ajax({
@@ -105,7 +104,6 @@
                         },
                         success: _.bind(this.enrollSuccess, this),
                         error: _.bind(this.enrollError, this),
-                        complete: _.bind(this.enrollComplete, this),
                     });
                  },
 
@@ -121,7 +119,7 @@
                     this.$enterCourseBtn.removeClass('hidden');
                     this.$dateDisplayField.prepend('<span class="fa fa-check"></span>');
 
-                    // Reload the session selection panel
+                    // Reload the session selection panel and close it
                     this.render(this.entitlementModel.toJSON());
                     this.toggleSessionSelectionPanel();
                  },
@@ -131,32 +129,53 @@
                     this.$dateDisplayField.find('fa fa-spin').removeClass('fa-spin fa-spinner').addClass('fa-');
                  },
 
-                 enrollComplete: function(data) {
-                    this.$('.enroll-btn').removeClass('disabled');
-                 },
-
                  updateEnrollBtn: function() {
                      /*
-                     Disables the enroll button if the user has selected an already enrolled session
-                     and updates the text to represent the desired action.
+                      This function plays three crucial roles:
+                      1) Enables and Disables enroll button
+                      2) Changes text to describe the action taken
+                      3) Formats the confirmation popover to allow for two step authentication
                       */
-                     var enrollText;
+                     var enrollText,
+                        confirmationText;
+                     var currentSessionId = this.entitlementModel.get('currentSessionId');
                      var newSessionId = this.$('.session-select').find('option:selected').data('session_id');
-                     var enrollBtn = this.$('.enroll-btn');
-                     if (this.entitlementModel.attributes.currentSessionId == newSessionId) {
+                     var enrollBtn = this.$('.enroll-btn-initial');
+
+                     // Disable the button if the user is already enrolled in that session.
+                     if (currentSessionId == newSessionId) {
                         enrollBtn.addClass('disabled');
                      } else {
                         enrollBtn.removeClass('disabled');
                      }
 
-                     // Update the button text
+                     // Update the button text based on whether the user is initially enrolling or changing session.
                      if (newSessionId) {
-                         enrollText = this.entitlementModel.attributes.currentSessionId ? gettext('Change Session') :
-                             gettext('Enroll in Session');
+                         enrollText = currentSessionId ? gettext('Change Session') : gettext('Enroll in Session');
                      } else {
                          enrollText = gettext("Leave Current Session");
                      }
                      this.$('.enroll-btn').text(enrollText);
+
+
+                     // Update the button popover to enable two step authentication and bind enroll to event.
+                     if (newSessionId) {
+                         confirmationText = currentSessionId ?
+                             gettext('Are you sure that you would like to change session?') :
+                             gettext('Are you sure that you would like to enroll in this session?');
+                     } else {
+                         confirmationText = gettext("Are you sure that you would like to unenroll from this session?");
+                     }
+                     $('.enroll-btn-initial').popover({
+                        placement: 'bottom',
+                        container: 'body',
+                        html: true,
+                        trigger: 'focus',
+                        content: '<p>' + confirmationText + '</p>' +
+                            '<button type="button" class="popover-dismiss final-confirmation" tabindex="0">'+ gettext('No') + '</button>' +
+                            '<button type="button" class="enroll-btn final-confirmation" tabindex="0">'+ gettext('Yes') + '</button>'
+                    });
+                     // $('.enroll-btn-initial').on('click', function(){alert('hi'), this.$('.popover-dismiss').focus()}, this);
                  },
              });
          }
