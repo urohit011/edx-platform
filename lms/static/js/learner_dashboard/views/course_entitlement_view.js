@@ -169,8 +169,8 @@
                      } else {
                          confirmationText = gettext('Are you sure that you would like to unenroll from this session?');
                      }
-                     $('.enroll-btn-initial').popover('dispose');
-                     $('.enroll-btn-initial').popover({
+                     this.$('.enroll-btn-initial').popover('dispose');
+                     this.$('.enroll-btn-initial').popover({
                         placement: 'bottom',
                         container: this.$el,
                         html: true,
