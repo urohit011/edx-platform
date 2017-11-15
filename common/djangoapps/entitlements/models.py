@@ -28,7 +28,7 @@ class CourseEntitlement(TimeStampedModel):
     @classmethod
     def get_active_user_course_entitlements(cls, user, course_uuid):
         """
-        Returns all the available sessions for a given course.        
+        Returns all the available sessions for a given course.
         """
 
         try:
@@ -44,6 +44,6 @@ class CourseEntitlement(TimeStampedModel):
     @classmethod
     def set_enrollment(cls, entitlement, enrollment):
         """
-        Fulfills an entitlement by specifying a session.        
+        Fulfills an entitlement by specifying a session.
         """
         cls.objects.filter(id=entitlement.id).update(enrollment_course_run=enrollment)
