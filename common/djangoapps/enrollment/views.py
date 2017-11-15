@@ -586,7 +586,6 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
         course_entitlement = None
         if course_uuid:
             course_entitlement = CourseEntitlement.get_active_user_course_entitlements(user, course_uuid)
-            mode = course_entitlement.mode
 
         if course_entitlement and course_entitlement.enrollment_course_run is not None:
             return Response(
@@ -632,12 +631,15 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                 consent_client.provide_consent(**kwargs)
 
             # Add Enrollment for the Entitlement user with the correct Mode
+            # This should only occur if the User has a Course Entitlement in place.
+            # As a reault the api_key_permissions do not apply the User may enroll themselves based on the entitlement.
             if course_entitlement:
+                mode = course_entitlement.mode
                 response = api.add_enrollment(
                     username,
                     unicode(course_id),
                     mode=mode,
-                    is_active=is_active,
+                    is_active=True,
                 )
                 CourseEntitlement.set_enrollment(
                     entitlement=course_entitlement,
