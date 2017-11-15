@@ -2,9 +2,9 @@
 
 import json
 import logging
-import urlparse
 from datetime import datetime
 
+import urlparse
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model
@@ -16,7 +16,6 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 from django_countries import countries
-
 import third_party_auth
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.commerce.models import CommerceConfiguration
@@ -532,6 +531,8 @@ def account_settings_context(request):
         # it will be broken if exception raised
         user_orders = []
 
+    site_extra_fields = configuration_helpers.get_value('REGISTRATION_EXTRA_FIELDS', settings.REGISTRATION_EXTRA_FIELDS)
+
     context = {
         'auth': {},
         'duplicate_provider': None,
@@ -566,6 +567,12 @@ def account_settings_context(request):
         'show_dashboard_tabs': True,
         'order_history': user_orders
     }
+
+    for field in RegistrationFormFactory.EXTRA_FIELDS:
+        if field in context['fields'].keys():
+            context['fields'][field]['visibility'] = site_extra_fields.get(field, "hidden")
+        else:
+            context['fields'][field] = {'visibility': site_extra_fields.get(field, "hidden")}
 
     if third_party_auth.is_enabled():
         # If the account on the third party provider is already connected with another edX account,
